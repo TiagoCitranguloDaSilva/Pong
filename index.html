@@ -6,12 +6,25 @@
     <title>Pong</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body onresize="refresh()" onmousemove="mousePos(event)">
+<body onresize="refresh()" onmousemove="mousePos(event)" onload="play()">
     <main id="mesa">
         <div class="pau" id="p1"></div>
         <div id="teste"></div>
         <div class="pau" id="p2"></div>
     </main>
+    <aside id="telaFinal">
+        <div id="display">
+            <div id="msg">
+
+            </div>
+            <div id="btnProx">
+                <button onclick="playButton()">Tentar Novamente</button>
+            </div>
+        </div>
+    </aside>
+    <aside id="play">
+        <button id="playButton" onclick="playButton()">Play</button>
+    </aside>
     <script src='code.js'></script>
 </body>
 </html>

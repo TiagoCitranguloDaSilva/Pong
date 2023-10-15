@@ -14,7 +14,33 @@ console.log(posP[0][1])
 var tamP = [document.getElementById('p1').clientWidth, document.getElementById('p1').clientHeight]
 var movP = 0.1
 var statusJogo = 'stop'
+var bolaAtual
+var tamBola
+var mover;
 
+
+
+function play(){
+    document.getElementById('play').style.display = 'flex'
+}
+
+function playButton(){
+    direcaoHori = movOriginalHori
+    direcaoVerti = movOriginalVerti
+    batidas = 0
+    document.getElementById('play').style.display = 'none'
+    document.getElementById('telaFinal').style.display = 'none'
+    criarBola()
+    bolaAtual = document.getElementById('bola')
+    tamBola = bolaAtual.clientHeight
+    setTimeout(function (){
+        mover = setInterval(function (){
+            moverBola()
+        }, 20)
+    }, 1000)
+
+    moverBola()
+}
 
 
 function mousePos(event){
@@ -42,17 +68,8 @@ function moveP1(){
 
 }
 
-criarBola()
-var bolaAtual = document.getElementById('bola')
-var tamBola = bolaAtual.clientHeight
-var mover;
-setTimeout(function (){
-    mover = setInterval(function (){
-        moverBola()
-    }, 20)
-}, 1000)
 
-moverBola()
+
 
 function criarBola(){
     let bola = document.createElement('div')
@@ -106,6 +123,8 @@ function moverBola(){
     if(posAtual[0] - tamBola / 2 <= 0 || posAtual[0] + tamBola / 2 >= largTela){
         clearInterval(mover)
         bolaAtual.remove()
+        statusJogo = 'stop'
+        telaFinal()
         return
     }
 
@@ -162,4 +181,9 @@ function movP2(){
     }
     
     
+}
+
+function telaFinal(){
+    document.getElementById('telaFinal').style.display = 'flex'
+    document.getElementById('msg').innerHTML = 'Parabéns, ocorreram ' + batidas + ' rebatidas!'
 }
