@@ -1,6 +1,9 @@
 var posAtual = [0, 0]
-var direcaoHori = 5
-var direcaoVerti = 5
+var batidas = 0
+var movOriginalHori = 5
+var movOriginalVerti = 5
+var direcaoHori = movOriginalHori
+var direcaoVerti = movOriginalVerti
 var largTela = document.getElementById('mesa').clientWidth
 var altTela = document.getElementById('mesa').clientHeight
 var mousePosition;
@@ -9,7 +12,7 @@ document.getElementById('p2').style.top = parseInt(altTela / 2) + 'px'
 var posP = [[80, parseInt(altTela / 2)], [80, parseInt(altTela / 2)]]
 console.log(posP[0][1])
 var tamP = [document.getElementById('p1').clientWidth, document.getElementById('p1').clientHeight]
-var movP = 10 
+var movP = 0.1
 var statusJogo = 'stop'
 
 
@@ -31,7 +34,6 @@ function moveP1(){
         if(posP[0][1] + movimento > altTela - tamP[1] / 2 || posP[0][1] + movimento < 0 + tamP[1] / 2){
             return
         }
-
 
         posP[0][1] += movimento
         document.getElementById('p1').style.top = posP[0][1] + 'px'
@@ -85,17 +87,19 @@ function moverBola(){
         posAtual[1] += direcaoVerti
     }
 
-    if(posAtual[1] - tamBola / 2 + direcaoVerti > posP[0][1] - tamP[1] / 2 && posAtual[1] + tamBola / 2 + direcaoVerti < posP[0][1] + tamP[1] / 2){
+    if(posAtual[1] + direcaoVerti > posP[0][1] - tamP[1] / 2 && posAtual[1] + direcaoVerti < posP[0][1] + tamP[1] / 2){
         if(posAtual[0] - tamBola / 2 + direcaoHori <= posP[0][0] + tamP[0] / 2){
             direcaoHori *= -1
             posAtual[0] = posP[0][0] + tamP[0] / 2 + tamBola / 2
+            batidas++
         }
     }
+    
 
-    if(posAtual[1] - tamBola / 2 + direcaoVerti > posP[1][1] - tamP[1] / 2 && posAtual[1] + tamBola / 2 + direcaoVerti < posP[1][1] + tamP[1] / 2){
-        if(posAtual[0] + tamBola / 2 + direcaoHori >= largTela - posP[1][0] + tamP[0] / 2){
-            posAtual[0] = largTela - posP[1][0] - tamP[0] / 2 - tamBola / 2
+    if(posAtual[1] + direcaoVerti > posP[1][1] - tamP[1] / 2 && posAtual[1] + direcaoVerti < posP[1][1] + tamP[1] / 2){
+        if(posAtual[0] + tamBola / 2 >= largTela - posP[1][0] - tamP[0] / 2){
             direcaoHori *= -1
+            batidas++
         }
     }
 
@@ -109,6 +113,31 @@ function moverBola(){
     bola.style.top = posAtual[1] + 'px'
 
     movP2()
+
+    if(batidas > 0){
+        if(direcaoVerti > 0){
+            direcaoVerti = movOriginalVerti + movOriginalVerti * (batidas / 5)
+            if(direcaoVerti > 25){
+                direcaoVerti = 25
+            }
+        }else{
+            direcaoVerti = (movOriginalVerti + movOriginalVerti * (batidas / 5))*-1
+            if(direcaoVerti < -25){
+                direcaoVerti = -25
+            }
+        }
+        if(direcaoHori > 0){
+            direcaoHori = movOriginalHori + movOriginalHori * (batidas / 5)
+            if(direcaoHori > 25){
+                direcaoHori = 25
+            }
+        }else{
+            direcaoHori = (movOriginalHori + movOriginalHori * (batidas / 5))*-1
+            if(direcaoHori < -25){
+                direcaoHori = -25
+            }
+        }
+    }
 }
 
 function refresh(){
@@ -116,6 +145,7 @@ function refresh(){
 }
 
 function movP2(){
+
     let movimento;
     if(posAtual[1] != posP[1][1]){
         movimento = posAtual[1] - posP[1][1]
@@ -130,4 +160,6 @@ function movP2(){
         document.getElementById('p2').style.top = posP[1][1] + 'px'
 
     }
+    
+    
 }
