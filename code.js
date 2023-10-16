@@ -1,3 +1,4 @@
+
 var posAtual = [0, 0]
 var batidas = 0
 var movOriginalHori = 5
@@ -17,6 +18,15 @@ var statusJogo = 'stop'
 var bolaAtual
 var tamBola
 var mover;
+var especial = false
+var powerIn = false
+var posPower = [0, 0]
+
+var powerInt = setInterval(function (){
+    if(especial && !powerIn){
+        powerUp()
+    }
+}, 15000)
 
 
 
@@ -24,7 +34,17 @@ function play(){
     document.getElementById('play').style.display = 'flex'
 }
 
-function playButton(){
+function playButton(modo){
+    if(modo == 'especial'){
+        especial = true
+        powerIn = false
+        clearInterval(powerInt)
+        powerInt = setInterval(function (){
+            if(especial && !powerIn){
+                powerUp()
+            }
+        }, 15000)
+    }
     direcaoHori = movOriginalHori
     direcaoVerti = movOriginalVerti
     batidas = 0
@@ -122,6 +142,7 @@ function moverBola(){
 
     if(posAtual[0] - tamBola / 2 <= 0 || posAtual[0] + tamBola / 2 >= largTela){
         clearInterval(mover)
+        clearInterval(powerInt)
         bolaAtual.remove()
         statusJogo = 'stop'
         telaFinal()
@@ -157,6 +178,39 @@ function moverBola(){
             }
         }
     }
+
+    
+
+    if(powerIn){
+        
+        if(posAtual[0] + tamBola / 2 - 5 > posPower[0] - tamBola / 2 && posAtual[0] - tamBola / 2 + 5 < posPower[0] + tamBola / 2 ){
+            if(posAtual[1] + tamBola / 2 > posPower[1] - tamBola / 2 && posAtual[1] + tamBola / 2 <  posPower[1] + tamBola / 2){
+                power()
+                document.getElementById('powerUp').remove()
+                powerIn = false
+            }else if(posAtual[1] - tamBola / 2 < posPower[1] + tamBola / 2 && posAtual[1] - tamBola / 2 >  posPower[1] - tamBola / 2){
+                power()
+                document.getElementById('powerUp').remove()
+                powerIn = false
+            }
+        }
+    }
+
+}
+
+function power(){
+    if(document.getElementById('powerUp').classList[0] == 'aumentar'){
+        console.log('entrou')
+        let tamOriginal = tamBola
+        tamBola = 100
+        document.getElementById('bola').style.width = tamBola + 'px'
+        document.getElementById('bola').style.height = tamBola + 'px'
+        setTimeout(function (){
+            document.getElementById('bola').style.width = tamOriginal + 'px'
+            document.getElementById('bola').style.height = tamOriginal + 'px'
+            tamBola = tamOriginal
+        }, 5000)
+    }
 }
 
 function refresh(){
@@ -186,4 +240,23 @@ function movP2(){
 function telaFinal(){
     document.getElementById('telaFinal').style.display = 'flex'
     document.getElementById('msg').innerHTML = 'Parabéns, ocorreram ' + batidas + ' rebatidas!'
+}
+
+function powerUp(){
+    powerIn = true
+    let escolhaPower = ['aumentar']
+    let esc = escolhaPower[Math.floor(Math.random() * (escolhaPower.length - 1))]
+    console.log(esc)
+    let circulo = criarCirculo()
+    circulo.classList.add(esc)
+    document.getElementById('mesa').appendChild(circulo)
+    posPower = [(Math.floor(Math.random() * (largTela / 4 - tamBola / 2 + 200)) * 2), (Math.floor(Math.random() * altTela / 2 - tamBola / 2 )) + 170]
+    document.getElementById('powerUp').style.left = posPower[0] + 'px'
+    document.getElementById('powerUp').style.top =  posPower[1]+ 'px'
+}
+
+function criarCirculo(){
+    let circulo = document.createElement('div')
+    circulo.id = 'powerUp'
+    return circulo
 }

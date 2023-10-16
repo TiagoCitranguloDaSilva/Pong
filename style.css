@@ -89,9 +89,11 @@ main{
 }
 
 #play{
-    display: none;
+    /* display: none; */
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     align-items: center;
-    justify-content: center;
+    justify-content: space-evenly;
     position: absolute;
     top: 0px;
     left: 0px;
@@ -100,7 +102,19 @@ main{
     backdrop-filter: blur(5px);
 }
 
-#playButton{
+#play div{
+    display: grid;
+    color: white;
+    text-align: center;
+    grid-template-rows: 1fr 2fr;
+    row-gap: 30px;
+}
+
+#play div p{
+    font-size: 2em;
+}
+
+.playButton{
     padding: 30px 50px;
     font-size: 5em;
     border-radius: 6px;
@@ -111,4 +125,13 @@ main{
 
 #playButton:hover{
     background-color: white;
+}
+
+#powerUp{
+    width: 60px;
+    height: 60px;
+    background-color: darkgray;
+    position: absolute;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
 }

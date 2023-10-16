@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pong</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="shortcut icon" href="Pong.ico" type="image/x-icon">
 </head>
 <body onresize="refresh()" onmousemove="mousePos(event)" onload="play()">
     <main id="mesa">
@@ -18,12 +19,19 @@
 
             </div>
             <div id="btnProx">
-                <button onclick="playButton()">Tentar Novamente</button>
+                <button onclick="refresh()">Tentar Novamente</button>
             </div>
         </div>
     </aside>
     <aside id="play">
-        <button id="playButton" onclick="playButton()">Play</button>
+        <div>
+            <p>Jogar jogo original</p>
+            <button class="playButton" onclick="playButton('original')">Play</button>
+        </div>
+        <div>
+            <p>Jogar jogo especial</p>
+            <button class="playButton" onclick="playButton('especial')">Play</button>
+        </div>
     </aside>
     <script src='code.js'></script>
 </body>
