@@ -86,6 +86,21 @@ function moveP1(){
 
     }
 
+    // let movimento;
+    // if(posAtual[1] != posP[0][1]){
+    //     movimento = posAtual[1] - posP[0][1]
+
+        
+    //     if(posP[0][1] + movimento > altTela - tamP[1] / 2 || posP[0][1] + movimento < 0 + tamP[1] / 2){
+    //         return
+    //     }
+
+
+    //     posP[0][1] += movimento
+    //     document.getElementById('p1').style.top = posP[1][1] + 'px'
+
+    // }
+
 }
 
 
@@ -199,10 +214,21 @@ function moverBola(){
 }
 
 function power(){
+    let tamOriginal
     if(document.getElementById('powerUp').classList[0] == 'aumentar'){
-        console.log('entrou')
-        let tamOriginal = tamBola
+        tamOriginal = tamBola
         tamBola = 100
+        document.getElementById('bola').style.width = tamBola + 'px'
+        document.getElementById('bola').style.height = tamBola + 'px'
+        setTimeout(function (){
+            document.getElementById('bola').style.width = tamOriginal + 'px'
+            document.getElementById('bola').style.height = tamOriginal + 'px'
+            tamBola = tamOriginal
+        }, 5000)
+    }
+    if(document.getElementById('powerUp').classList[0] == 'diminuir'){
+        tamOriginal = tamBola
+        tamBola = 40
         document.getElementById('bola').style.width = tamBola + 'px'
         document.getElementById('bola').style.height = tamBola + 'px'
         setTimeout(function (){
@@ -244,13 +270,14 @@ function telaFinal(){
 
 function powerUp(){
     powerIn = true
-    let escolhaPower = ['aumentar']
-    let esc = escolhaPower[Math.floor(Math.random() * (escolhaPower.length - 1))]
+    let escolhaPower = ['aumentar', 'diminuir']
+    let esc = Math.floor(Math.random() * escolhaPower.length)
     console.log(esc)
+    esc = escolhaPower[esc]
     let circulo = criarCirculo()
     circulo.classList.add(esc)
     document.getElementById('mesa').appendChild(circulo)
-    posPower = [(Math.floor(Math.random() * (largTela / 4 - tamBola / 2 + 200)) * 2), (Math.floor(Math.random() * altTela / 2 - tamBola / 2 )) + 170]
+    posPower = [(Math.floor(Math.random() * (largTela / 4 - tamBola / 2 + largTela / 5 - largTela / 8) + 80) * 2), (Math.floor(Math.random() * altTela / 2 - tamBola / 2 )) + 170]
     document.getElementById('powerUp').style.left = posPower[0] + 'px'
     document.getElementById('powerUp').style.top =  posPower[1]+ 'px'
 }
