@@ -1,5 +1,4 @@
 
-
 // Posição atual da bola [X, Y]
 var posAtual = [0, 0];
 
@@ -90,311 +89,744 @@ function play(){
 
 }
 
+// Função chama ao apertar o botão Play, e passa o modo, se é normal ou especial
 function playButton(modo){
+
+    // Se for especial
     if(modo == 'especial'){
-        especial = true
-        powerIn = false
-        clearInterval(powerInt)
+
+        // Fala que a rodada é especial
+        especial = true;
+
+        // Diz que não existe nenhum porwerUp na tela
+        powerIn = false;
+
+        // Apaga o intervalo que faz aparecer poderes, caso já tenha tido rodadas anteriores
+        clearInterval(powerInt);
+
+        // Inicia o intevalo que faz aparecer os powerUps
         powerInt = setInterval(function (){
+
+            // Se for uma rodada especial e não tiver um powerUp na tela
             if(especial && !powerIn){
-                powerUp()
+
+                // Cria um powerUp
+                powerUp();
+
             }
-        }, 15000)
+
+        }, 15000);
+
     }
-    direcaoHori = movOriginalHori
+
+    // A direção horizontal se torna igual ao movimento original
+    direcaoHori = movOriginalHori;
+
+    // Roda um valor aleatório que define se vai começar indo pra esquerda ou direita
     if(Math.random() > 0.5){
+
+        // A bola vai começar indo pra esquerda
         direcaoHori *= -1;
+
     }
-    direcaoVerti = movOriginalVerti
+
+    // A direção vertical se torna igual ao movimento original
+    direcaoVerti = movOriginalVerti;
+
+    // Roda um valor aleatório que define se vai começar indo pra cima ou baixo
     if(Math.random() > 0.5){
+
+        // A bola vai começar subindo
         direcaoVerti *= -1;
+
     }
-    batidas = 0
-    document.getElementById('play').style.display = 'none'
-    document.getElementById('telaFinal').style.display = 'none'
-    criarBola()
-    bolaAtual = document.getElementById('bola')
-    tamBola = bolaAtual.clientHeight
+
+    // Reseta o número de batidas
+    batidas = 0;
+
+    // Retira a tela dos botões de play
+    document.getElementById('play').style.display = 'none';
+
+    // retira a tela final
+    document.getElementById('telaFinal').style.display = 'none';
+
+    // Cria uma nova bola na tela
+    criarBola();
+
+    // Pega a bola atual
+    bolaAtual = document.getElementById('bola');
+
+    // Pega o tamanho da bola
+    tamBola = bolaAtual.clientHeight;
+
+    // Vai esperar um segundo para começar a mover a bola
     setTimeout(function (){
+
+        // O movimento da bola
         mover = setInterval(function (){
-            moverBola()
-        }, 20)
-    }, 1000)
 
-    moverBola()
+            // Mover a bola
+            moverBola();
+
+        }, 20);
+
+    }, 1000);
+
 }
 
-
+// Ativado ao mover o mouse
 function mousePos(event){
+
+    // Se o jogo estiver rodando
     if(statusJogo == 'run'){
+
+        // Espera um tempo
         setTimeout(function (){
-            mousePosition = event.clientY
-            moveP1()
-        }, 100)
+
+            // Atualiza a altura do mouse
+            mousePosition = event.clientY;
+
+            // Move o primeiro Stick
+            moveP1();
+
+        }, 100);
+
     }
+
 }
 
+// Movimento do primeiro Stick
 function moveP1(){
+
+    // O quanto o Stick tem que se mexer
     let movimento;
+
+    // Se a altura do mouse for diferente da altura do primeiro Stick
     if(mousePosition != posP[0][1]){
-        movimento = mousePosition - posP[0][1]
+
+        // Descobre o quanto o movimento tem que se mexer
+        movimento = mousePosition - posP[0][1];
         
+        // Se a altura do primeiro Stick + o quanto ele tem que se mexer for maior que a altura da tela menos a altura do primeiro Stick dividido por 2 OU a altura do primeiro stick mais o movimento for menor que o tamanho do primeiro Stick dividido por 2
         if(posP[0][1] + movimento > altTela - tamP[0][1] / 2 || posP[0][1] + movimento < 0 + tamP[0][1] / 2){
-            return
+
+            // Sai da função
+            return;
+
         }
 
-        posP[0][1] += movimento
-        document.getElementById('p1').style.top = posP[0][1] + 'px'
+        // Muda a altura do primeiro Stick
+        posP[0][1] += movimento;
+
+        // Realmente muda a altura
+        document.getElementById('p1').style.top = posP[0][1] + 'px';
 
     }
 
 }
 
-
-
-
+// Cria a bola
 function criarBola(){
-    let bola = document.createElement('div')
-    bola.id = 'bola'
-    let posX = parseInt(Number(largTela) / 2)
-    let posY = parseInt(Number(altTela) / 2)
-    posAtual = [posX, posY]
-    bola.style.top =  posY+ 'px'
-    bola.style.left = posX + 'px'
-    document.getElementById('mesa').appendChild(bola)
-    statusJogo = 'run'
+
+    // Cria uma div
+    let bola = document.createElement('div');
+
+    // Define o id da bola como 'bola'
+    bola.id = 'bola';
+
+    // A bola vai começar no meio da tela
+    let posX = parseInt(Number(largTela) / 2);
+
+    // A bola vai começar no meio da tela
+    let posY = parseInt(Number(altTela) / 2);
+
+    // Define a posição da bola
+    posAtual = [posX, posY];
+
+    // Coloca a bola na altura certa
+    bola.style.top =  posY+ 'px';
+
+    // Coloca a bola no lugar certo
+    bola.style.left = posX + 'px';
+
+    // Coloca a bola na tela
+    document.getElementById('mesa').appendChild(bola);
+
+    // Define o jogo como 'run'
+    statusJogo = 'run';
+
 }
 
+// Função que move a bola
 function moverBola(){
+
+    // Se a posição X da bola mais a direção que ela esta indo mais o tamanho da bola dividido por 2 for maior ou igual a largura da tela
     if(posAtual[0] + direcaoHori + tamBola / 2 >= largTela){
-        posAtual[0] = largTela - tamBola / 2
-        direcaoHori *= -1
+
+        // Define o eixo X da bola como a largura da tela menos o tamanho da bola dividido por 2
+        posAtual[0] = largTela - tamBola / 2;
+
+    // Senão se o eixo X da bola menos o tamanho da bola dividido por 2 mais a direção que a bola esta indo for menor ou igual a 0
     }else if(posAtual[0] - (tamBola / 2) + direcaoHori  <= 0){
-        posAtual[0] = 0 + tamBola / 2
-        direcaoHori *= -1
+
+        // Define o eixo X como 0 mais o tamanho da bola dividido por 2
+        posAtual[0] = 0 + tamBola / 2;
+
+    // Senão
     }else{
-        posAtual[0] += direcaoHori
+
+        // Move a bola horizontalmente
+        posAtual[0] += direcaoHori;
+
     }
 
+    // Se o eixo Y da bola mais o tamanho da bola dividido por 2 mais a direção que ela esta indo na vertical for maior ou igual a altura da tela
     if(posAtual[1] + tamBola / 2 + direcaoVerti >= altTela){
-        posAtual[1] = altTela - tamBola / 2
-        direcaoVerti *= -1
+
+        // Define a altura atual da bola como a altura da tela menos o tamanho da bola dividido por 2
+        posAtual[1] = altTela - tamBola / 2;
+
+        // Inverte a direção que a bola está indo verticalmente
+        direcaoVerti *= -1;
+
+    // Senão se a altura atual da bola menos o tamanho da bola dividido por 2 mais a direção que ele está indo na vertical for maior ou igual a 0
     }else if(posAtual[1] - tamBola / 2 + direcaoVerti <= 0){
-        posAtual[1] = 0 + tamBola / 2
-        direcaoVerti *= -1
+
+        // Define a altura da bola como 0 mais o tamanho da bola dividido por 2
+        posAtual[1] = 0 + tamBola / 2;
+
+        // Inverte a direção que a bola está indo verticalmente
+        direcaoVerti *= -1;
+
+    // Senão
     }else{
-        posAtual[1] += direcaoVerti
+
+        // Move a bola verticalmente
+        posAtual[1] += direcaoVerti;
+
     }
 
+    // Se a altura da bola mais a direção que ela está indo for maior que a altura do primeiro Stick menos o tamanho dele dividido por 2
+    // ( Se a altura da bola for maior que o ponto mais alto do primeiro Stick ) E
+    // a altura da bola mais a direção que ela está indo for menor que a altura do primeiro Stick mais o tamanho dele dividido por 2
+    // ( Se a altura da bola for menor que o ponto mais baixo do primeiro Stick )
     if(posAtual[1] + direcaoVerti > posP[0][1] - tamP[0][1] / 2 && posAtual[1] + direcaoVerti < posP[0][1] + tamP[0][1] / 2){
+
+        // Se o eixo X da bola menos o tamanho da bola dividido por 2 for menor ou igual ao eixo X do primeiro Stick mais a largura do Stick dividido por 2
         if(posAtual[0] - tamBola / 2 + direcaoHori <= posP[0][0] + tamP[0][0] / 2){
-            direcaoHori *= -1
-            ultBatida = 'left'
-            posAtual[0] = posP[0][0] + tamP[0][0] / 2 + tamBola / 2
-            batidas++
+
+            // Inverte a direção horizontal
+            direcaoHori *= -1;
+
+            // Diz que a última pessoa a bater na bola foi o primeiro Stick
+            ultBatida = 'left';
+
+            // Define o eixo X da bola como o eixo X do primeiro Stick mais a largura do primeiro Stick dividido por 2 mais o tamanho da bola dividido por 2
+            posAtual[0] = posP[0][0] + tamP[0][0] / 2 + tamBola / 2;
+
+            // Adiciona mais 1 ao contador de batidas
+            batidas++;
+
         }
+
     }
     
-
+    // Se o eixo X da bola mais a direção que ela está indo for maior que a altura do segundo Stick menos a altura dele dividido por 2
+    // ( Se a altura da bola for maior que o ponto mais alto do segundo Stick ) E
+    // e o eixo X da bola mais a direção que ela está indo for menor que a altura do segundo Stick mais a altura dele dividido por 2
     if(posAtual[1] + direcaoVerti > posP[1][1] - tamP[1][1] / 2 && posAtual[1] + direcaoVerti < posP[1][1] + tamP[1][1] / 2){
+
+        // Se o eixo X da bola mais o tamanho dela dividido por 2 for maior ou igual a largura da tela menos o eixo X do segundo Stick menos a largura do segundo Stick dividido por 2
         if(posAtual[0] + tamBola / 2 >= largTela - posP[1][0] - tamP[1][0] / 2){
-            direcaoHori *= -1
-            ultBatida = 'right'
-            batidas++
+
+            // Inverte a direção horizontal da bola
+            direcaoHori *= -1;
+
+            // define que o último a bater na bola foi o segundo Stick
+            ultBatida = 'right';
+
+            // Adiciona mais um ao valor da contagem de batidas
+            batidas++;
+
         }
+
     }
 
+    // Se a posição X da bola menos o tamanho da bola dividido por 2 for menor ou igual a 0 OU a posição X da bola mais o tamanho da bola dividido por 2 for maior ou igual a largura da tela 
     if(posAtual[0] - tamBola / 2 <= 0 || posAtual[0] + tamBola / 2 >= largTela){
-        clearInterval(mover)
-        clearInterval(powerInt)
-        bolaAtual.remove()
-        statusJogo = 'stop'
-        telaFinal()
-        return
+
+        // Para de mover a bola
+        clearInterval(mover);
+
+        // Para de adicionar poderes
+        clearInterval(powerInt);
+
+        // Remove a bola em jogo
+        bolaAtual.remove();
+
+        // Define o status do jogo como parado
+        statusJogo = 'stop';
+
+        // Chama a tela final
+        telaFinal();
+
+        // Sai da função
+        return;
+
     }
 
-    bola.style.left = posAtual[0] + 'px'
-    bola.style.top = posAtual[1] + 'px'
+    // Altera a posição horizontal da bola
+    bola.style.left = posAtual[0] + 'px';
 
-    movP2()
+    // Altera a posição vertical da bola
+    bola.style.top = posAtual[1] + 'px';
 
+
+    // Move o segundo Stick
+    movP2();
+
+    // Se o número de batidas for maior que 0
     if(batidas > 0){
+
+        // Se a bola estiver descendo
         if(direcaoVerti > 0){
-            direcaoVerti = movOriginalVerti + movOriginalVerti * (batidas / 5)
+
+            // Define a direção como direção original mais direção original vezes o número de batidas dividido por 5
+            direcaoVerti = movOriginalVerti + movOriginalVerti * (batidas / 5);
+
+            // Se a direção vertical for maior que 25
             if(direcaoVerti > 25){
-                direcaoVerti = 25
+
+                // Volta a direção a 25
+                direcaoVerti = 25;
+
             }
+
+        // Senão
         }else{
-            direcaoVerti = (movOriginalVerti + movOriginalVerti * (batidas / 5))*-1
+
+            // Define a direção como direção original mais direção original vezes o número de batidas dividido por 5, tudo isso vezes -1
+            direcaoVerti = (movOriginalVerti + movOriginalVerti * (batidas / 5))*-1;
+
+            // Se a direção vertical for menor que -25
             if(direcaoVerti < -25){
-                direcaoVerti = -25
+
+                // Volta a direção a 25
+                direcaoVerti = -25;
+        
             }
+
         }
+
+        // Se a bola estiver indo pra direita
         if(direcaoHori > 0){
-            direcaoHori = movOriginalHori + movOriginalHori * (batidas / 5)
+
+            // Define a direção como direção original mais direção original vezes 0 número de batidas vezes 5
+            direcaoHori = movOriginalHori + movOriginalHori * (batidas / 5);
+            
+            // Se a direção horizontal for maior que 25
             if(direcaoHori > 25){
-                direcaoHori = 25
+                
+                // Volta a direção a 25
+                direcaoHori = 25;
+                
             }
+            
+        // Senão
         }else{
-            direcaoHori = (movOriginalHori + movOriginalHori * (batidas / 5))*-1
+
+            // Define a direção como direção original mais direção original vezes 0 número de batidas vezes 5, tudo isso vezes -1
+            direcaoHori = (movOriginalHori + movOriginalHori * (batidas / 5))*-1;
+
+            // Se a direção for menor que -25
             if(direcaoHori < -25){
-                direcaoHori = -25
+
+                // Volta a direção a -25
+                direcaoHori = -25;
+
             }
+
         }
+
     }
 
-    
-
+    // Se tiver um poder na tela
     if(powerIn){
         
+        // Se o eixo x da bola mais o tamanho da bola dividido por 2 menos 5 for maior que o eixo X da bola de poder menos o tamanho da bola dividido por 2 E
+        // O eixo X da bola menos o tamanho da bola dividido por 2 mais 5 for menor que o eixo X da bola de poder mais o tamanho da bola dividido por 2
         if(posAtual[0] + tamBola / 2 - 5 > posPower[0] - tamBola / 2 && posAtual[0] - tamBola / 2 + 5 < posPower[0] + tamBola / 2 ){
+
+            // Se a altura da bola mais o tamanho da bola dividido por 2 for maior que o eixo Y da bola de poder menos o tamanho da bola dividido por 2 E
+            // e a altura da bola mais o tamanho da bola dividido por 2 for menor que o eixo Y da bola de poder mais o tamanho da bola dividido por 2
             if(posAtual[1] + tamBola / 2 > posPower[1] - tamBola / 2 && posAtual[1] + tamBola / 2 <  posPower[1] + tamBola / 2){
-                power()
-                document.getElementById('powerUp').remove()
-                powerIn = false
+
+                // Chama a função power()
+                power();
+
+                // Remove a bola de poder
+                document.getElementById('powerUp').remove();
+
+                // Define que não existe powerUps na tela
+                powerIn = false;
+            
+            // Senão se a altura da bola menos o tamanho da bola dividido por 2 for menor que a altura da bola de poder mais o tamanho da bola dividido por 2 E
+            // e a altura da bola menos o tamanho da bola dividido por 2 for maior que a altura da bola de poder menos o tamanho da bola
             }else if(posAtual[1] - tamBola / 2 < posPower[1] + tamBola / 2 && posAtual[1] - tamBola / 2 >  posPower[1] - tamBola / 2){
-                power()
-                document.getElementById('powerUp').remove()
-                powerIn = false
+
+                // Chama a função power()
+                power();
+
+                // Remove a bola de poder
+                document.getElementById('powerUp').remove();
+
+                // Define que não existe powerUps na tela
+                powerIn = false;
+
             }
+
         }
+
     }
 
 }
 
+// Função que faz os powerUps acontecerem
 function power(){
-    let tamOriginal
-    let powerUpTipo = document.getElementById('powerUp').classList[0]
+
+    // Cria uma variável que vai guardar o tamanho original das coisas
+    let tamOriginal;
+
+    // Pega o powerUp escolhido
+    let powerUpTipo = document.getElementById('powerUp').classList[0];
+
+    // Se o poder for do tipo 'aumentar'
     if(powerUpTipo == 'aumentar'){
+
+        // Pega o tamanho original da bola
         tamOriginal = tamBola
-        tamBola = 100
-        document.getElementById('bola').style.width = tamBola + 'px'
-        document.getElementById('bola').style.height = tamBola + 'px'
+
+        // Aumenta o tamanho da bola em 20
+        tamBola = tamOriginal + 20;
+
+        // Muda a largura da bola
+        document.getElementById('bola').style.width = tamBola + 'px';
+
+        // Muda a altura da bola
+        document.getElementById('bola').style.height = tamBola + 'px';
+
+        // Vai fazer a bola voltar ao tamanho original em 5 segundos
         setTimeout(function (){
-            document.getElementById('bola').style.width = tamOriginal + 'px'
-            document.getElementById('bola').style.height = tamOriginal + 'px'
-            tamBola = tamOriginal
-        }, 5000)
+
+            // Faz a bola voltar a largura normal
+            document.getElementById('bola').style.width = tamOriginal + 'px';
+
+            // Faz a bola voltar a altura normal
+            document.getElementById('bola').style.height = tamOriginal + 'px';
+
+            // Redefine o tamanho da bola
+            tamBola = tamOriginal;
+
+        }, 5000);
+
     }
+
+    // Se for do tipo 'diminuir'
     if(powerUpTipo == 'diminuir'){
-        tamOriginal = tamBola
-        tamBola = 40
-        document.getElementById('bola').style.width = tamBola + 'px'
-        document.getElementById('bola').style.height = tamBola + 'px'
+
+        // Guarda o tamanho original da bola
+        tamOriginal = tamBola;
+
+        // Muda o tamanho da bola
+        tamBola = tamOriginal - 20;
+
+        // Muda a largura da bola
+        document.getElementById('bola').style.width = tamBola + 'px';
+
+        // Muda a altura da bola
+        document.getElementById('bola').style.height = tamBola + 'px';
+
+        // Vai fazer a bola voltar ao tamanho normal depois de 5 segundos
         setTimeout(function (){
-            document.getElementById('bola').style.width = tamOriginal + 'px'
-            document.getElementById('bola').style.height = tamOriginal + 'px'
-            tamBola = tamOriginal
-        }, 5000)
+
+            // Faz a bola voltar a largura normal
+            document.getElementById('bola').style.width = tamOriginal + 'px';
+
+            // Faz a bola voltar a altura normal
+            document.getElementById('bola').style.height = tamOriginal + 'px';
+
+            // Redefine o tamanho da bola
+            tamBola = tamOriginal;
+
+        }, 5000);
+
     }
+
+    // Se for do tipo 'invertX'
     if(powerUpTipo == 'invertX'){
+
+        // Inverte a direção horizontal
         direcaoHori *= -1;
+
     }
+
+    // Se for do tipo 'invertY'
     if(powerUpTipo == 'invertY'){
+
+        // Inverte a direção Y
         direcaoVerti *= -1;
+
     }
+
+    // Se for do tipo 'diminuirP'
     if(powerUpTipo == 'diminuirP'){
-        let value = 0
+
+        // Cria uma variavel
+        let arrayValue = 0;
+
+        // Se a última batida for do Stick 1
         if(ultBatida == 'left'){
-            value = 0
+
+            // Define o valor da array como 0
+            arrayValue = 0;
+
         }else{
-            value = 1
+
+            // Define o valor da array como 1
+            arrayValue = 1;
+
         }
-        tamOriginal = tamP[value][1]
-        tamStick = tamOriginal - tamOriginal / 4
-        tamP[value][1] = tamStick
-        if(value == 0){
-            document.getElementById('p1').style.height = tamStick + 'px'
-            document.getElementById('p1').style.backgroundColor = 'cyan'
+
+        // Guarda a altura do Stick que tocou por último na bola
+        tamOriginal = tamP[arrayValue][1];
+
+        // Muda o tamanho do Stick para o tamanho original menos o tamanho original dividido por 4
+        tamStick = tamOriginal - tamOriginal / 4;
+
+        // Muda o tamanho do Stick
+        tamP[arrayValue][1] = tamStick;
+
+        // Se o valor da array for 0
+        if(arrayValue == 0){
+
+            // Muda a altura do Stick
+            document.getElementById('p1').style.height = tamStick + 'px';
+
+            // Muda a cor do Stick
+            document.getElementById('p1').style.backgroundColor = 'cyan';
+
+        // Senão
         }else{
-            document.getElementById('p2').style.height = tamStick + 'px'
-            document.getElementById('p2').style.backgroundColor = 'cyan'
+
+            // Muda a altura do Stick
+            document.getElementById('p2').style.height = tamStick + 'px';
+
+            // Muda a cor do Stick
+            document.getElementById('p2').style.backgroundColor = 'cyan';
+
         }
+
+        // Vai fazer o Stick voltar ao tamanho normal
         setTimeout(function (){
-            tamP[value][1] = tamOriginal
-            if(value == 0){
-                document.getElementById('p1').style.height = tamP[value][1] + 'px'
-                document.getElementById('p1').style.backgroundColor = 'white'
+
+            // Redefine o tamanho original do Stick
+            tamP[arrayValue][1] = tamOriginal;
+
+            // Se o valor da array for 0
+            if(arrayValue == 0){
+
+                // Redefine a altura do Stick
+                document.getElementById('p1').style.height = tamP[arrayValue][1] + 'px';
+
+                // Muda a cor do Stick de volta para branco
+                document.getElementById('p1').style.backgroundColor = 'white';
+
+            // Senão
             }else{
-                document.getElementById('p2').style.height = tamP[value][1] + 'px'
-                document.getElementById('p2').style.backgroundColor = 'white'
+
+                // Redefine a altura do Stick
+                document.getElementById('p2').style.height = tamP[arrayValue][1] + 'px';
+
+                // Muda a cor do Stick de volta para branco
+                document.getElementById('p2').style.backgroundColor = 'white';
+                
             }
-        }, 5000)
+
+        }, 5000);
+
     }
+
+    // Se for do tipo 'aumentarP'
     if(powerUpTipo == 'aumentarP'){
-        let value = 0
+
+        // Valor da array
+        let arrayValue;
+
+        // Se a bola encostou por último no Stick da esquerda
         if(ultBatida == 'left'){
-            value = 0
+
+            // Define o valor da array como 0
+            arrayValue = 0;
+
+        // Senão
         }else{
-            value = 1
+
+            // Define o valor da array como 1
+            arrayValue = 1;
+
         }
-        tamOriginal = tamP[value][1]
-        tamStick = tamOriginal + tamOriginal / 2
-        tamP[value][1] = tamStick
-        if(value == 0){
-            document.getElementById('p1').style.height = tamStick + 'px'
-            document.getElementById('p1').style.backgroundColor = 'cyan'
+
+        // Guarda a altura do segundo Stick
+        tamOriginal = tamP[arrayValue][1];
+
+        // Define o tamanho do Stick como o tamanho original mais o tamanho original dividido por 2
+        tamStick = tamOriginal + tamOriginal / 2;
+
+        // Muda o tamanho do Stick
+        tamP[arrayValue][1] = tamStick;
+
+        // Se o valor da array for 0
+        if(arrayValue == 0){
+
+            // Muda a altura do Stick
+            document.getElementById('p1').style.height = tamP[arrayValue][1] + 'px';
+
+            // Muda a cor do Stick para ciano
+            document.getElementById('p1').style.backgroundColor = 'cyan';
+
+        // Senão
         }else{
-            document.getElementById('p2').style.height = tamStick + 'px'
-            document.getElementById('p2').style.backgroundColor = 'cyan'
+
+            // Muda a altura do Stick
+            document.getElementById('p2').style.height = tamP[arrayValue][1] + 'px';
+
+            // Muda a cor do Stick para ciano
+            document.getElementById('p2').style.backgroundColor = 'cyan';
+
         }
+
+        // Faz o Stick voltar ao normal
         setTimeout(function (){
-            tamP[value][1] = tamOriginal
-            if(value == 0){
-                document.getElementById('p1').style.height = tamP[value][1] + 'px'
-                document.getElementById('p1').style.backgroundColor = 'white'
+
+            // Redefine a altura do Stick
+            tamP[arrayValue][1] = tamOriginal;
+
+            // Se o valor da array for 0
+            if(arrayValue == 0){
+
+                // Volta o Stick a altura padrão
+                document.getElementById('p1').style.height = tamP[arrayValue][1] + 'px';
+
+                // Volta a cor do Stick a branco
+                document.getElementById('p1').style.backgroundColor = 'white';
+
+            // Senão
             }else{
-                document.getElementById('p2').style.height = tamP[value][1] + 'px'
-                document.getElementById('p2').style.backgroundColor = 'white'
+
+                // Volta o Stick a altura padrão
+                document.getElementById('p2').style.height = tamP[arrayValue][1] + 'px';
+
+                // Volta a cor do Stick a branco
+                document.getElementById('p2').style.backgroundColor = 'white';
+
             }
-        }, 5000)
+
+        }, 5000);
+
     }
+
 }
 
+// Função que recarrega a página
 function refresh(){
-    document.location.reload()
+
+    // Recarrega a página
+    document.location.reload();
+
 }
 
+// Movimento o segundo Stick
 function movP2(){
 
+    // Irá guardar a diferença de distancia entre o segundo Stick e sua posição final
     let movimento;
-    if(posAtual[1] != posP[1][1]){
-        movimento = posAtual[1] - posP[1][1]
 
-        
+    // Se a altura da bola for diferente da altura do segundo Stick
+    if(posAtual[1] != posP[1][1]){
+
+        // Calcula a diferença da distancia entre a posição da bola e a altura do Stick
+        movimento = posAtual[1] - posP[1][1];
+
+        // Se a altura do segundo Stick mais a diferença for maior que a tela menos a altura do Stick dividido por 2 OU
+        // A altura do segundo Stick mais o movimento for menor que 0 mais a altura do segundo Stick dividido por 2
         if(posP[1][1] + movimento > altTela - tamP[1][1] / 2 || posP[1][1] + movimento < 0 + tamP[1][1] / 2){
-            return
+
+            // Sai da função
+            return;
+
         }
 
+        // Move o segundo Stick
+        posP[1][1] += movimento;
 
-        posP[1][1] += movimento
-        document.getElementById('p2').style.top = posP[1][1] + 'px'
+        // Realmente move o segundo Stick
+        document.getElementById('p2').style.top = posP[1][1] + 'px';
 
     }
     
     
 }
 
+// Chama a tela final do jogo
 function telaFinal(){
-    document.getElementById('telaFinal').style.display = 'flex'
-    document.getElementById('msg').innerHTML = 'Parabéns, ocorreram ' + batidas + ' rebatidas!'
+
+    // Faz a tela final aparecer
+    document.getElementById('telaFinal').style.display = 'flex';
+
+    // Coloca uma mensagem final
+    document.getElementById('msg').innerHTML = 'Parabéns, ocorreram ' + batidas + ' rebatidas!';
+
 }
 
+// Cria powerUps
 function powerUp(){
-    powerIn = true
-    let esc = Math.floor(Math.random() * escolhaPower.length)
-    console.log(esc)
-    esc = escolhaPower[esc]
-    let circulo = criarCirculo()
-    circulo.classList.add(esc)
-    document.getElementById('mesa').appendChild(circulo)
-    posPower = [(Math.floor(Math.random() * (largTela / 4 - tamBola / 2 + largTela / 5 - largTela / 8) + 80) * 2), (Math.floor(Math.random() * altTela / 2 - tamBola / 2 )) + 170]
-    document.getElementById('powerUp').style.left = posPower[0] + 'px'
-    document.getElementById('powerUp').style.top =  posPower[1]+ 'px'
+
+    // Fala que tem powerUps na tela
+    powerIn = true;
+
+    // Escolhe aleatoriamente um dos powerUps possiveis
+    let esc = escolhaPower[Math.floor(Math.random() * escolhaPower.length)];
+
+    // Cria um circulo
+    let circulo = criarCirculo();
+
+    // Adiciona o powerUp escolhido como classe
+    circulo.classList.add(esc);
+
+    // Coloca o circulo de poder na tela
+    document.getElementById('mesa').appendChild(circulo);
+
+    // Coloca o circulo numa posição aleatoria
+    posPower = [Math.floor((Math.random() * (largTela - posP[0][0] * 4))+ (posP[0][0] * 1.8)) , (Math.floor(Math.random() * altTela / 2 - tamBola / 2 )) + 170];
+
+    // Coloca a bola de poder na coordenada X correta
+    document.getElementById('powerUp').style.left = posPower[0] + 'px';
+
+    // Coloca a bola de poder na coordenada Y correta
+    document.getElementById('powerUp').style.top =  posPower[1]+ 'px';
+
 }
 
+// Cria o circulo do powerUp
 function criarCirculo(){
-    let circulo = document.createElement('div')
-    circulo.id = 'powerUp'
-    return circulo
+
+    // Cria o circulo
+    let circulo = document.createElement('div');
+
+    // Define o id do circulo
+    circulo.id = 'powerUp';
+
+    // Retorna a div
+    return circulo;
+
 }
