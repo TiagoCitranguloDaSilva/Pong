@@ -1,37 +1,93 @@
 
-var posAtual = [0, 0]
-var batidas = 0
-var movOriginalHori = 5
-var movOriginalVerti = 5
-var direcaoHori = movOriginalHori
-var direcaoVerti = movOriginalVerti
-var largTela = document.getElementById('mesa').clientWidth
-var altTela = document.getElementById('mesa').clientHeight
+
+// Posição atual da bola [X, Y]
+var posAtual = [0, 0];
+
+// Número de rebatidas ocorridas durante o jogo
+var batidas = 0;
+
+// Velocidade original da bola na horizontal
+var movOriginalHori = 5;
+
+// Velocidade original da bola na vertical
+var movOriginalVerti = 5;
+
+// A velocidade que a bola esta indo atualmente na horizontal
+var direcaoHori;
+
+// A velocidade que a bola esta indo atualmente na vertical
+var direcaoVerti;
+
+// Largura da tela
+var largTela = document.getElementById('mesa').clientWidth;
+
+// Altura da tela
+var altTela = document.getElementById('mesa').clientHeight;
+
+// Posição do mouse
 var mousePosition;
-document.getElementById('p1').style.top = parseInt(altTela / 2) + 'px'
-document.getElementById('p2').style.top = parseInt(altTela / 2) + 'px'
-var posP = [[80, parseInt(altTela / 2)], [80, parseInt(altTela / 2)]]
-console.log(posP[0][1])
-var tamP = [document.getElementById('p1').clientWidth, document.getElementById('p1').clientHeight]
-var movP = 0.1
-var statusJogo = 'stop'
-var bolaAtual
-var tamBola
-var mover;
-var especial = false
-var powerIn = false
-var posPower = [0, 0]
 
+// Coloca o primeiro Stick no meio da tela
+document.getElementById('p1').style.top = parseInt(altTela / 2) + 'px';
+
+// Coloca o segundo Stick no meio da tela
+document.getElementById('p2').style.top = parseInt(altTela / 2) + 'px';
+
+// As alturas do primeiro e do segund o Stick
+var posP = [[80, parseInt(altTela / 2)], [80, parseInt(altTela / 2)]];
+
+// Pega a altura dos Sticks
+var tamP = [[document.getElementById('p1').clientWidth, document.getElementById('p1').clientHeight], [document.getElementById('p2').clientWidth, document.getElementById('p2').clientHeight]];
+
+// A velocidade do movimento do Stick
+var movP = 0.1;
+
+// O status do jogo, se está rodando ou não
+var statusJogo = 'stop';
+
+// Pega a bola atual
+var bolaAtual;
+
+// O tamanho da bola
+var tamBola;
+
+// Irá guardar o Interval de movimento da bola
+var mover;;
+
+// Se é um jogo com powerUps, é naturalmente falso
+var especial = false;
+
+// Diz se tem uma bola de poder na tela
+var powerIn = false;
+
+// A posição da bola de poder
+var posPower = [0, 0];
+
+// Os powerUps possiveis
+var escolhaPower = ['aumentar', 'diminuir', 'invertX', 'invertY', 'diminuirP', 'aumentarP'];
+
+// O stick que bateu na bola por último ('left' ou 'right')
+var ultBatida;
+
+// Intervalo que coloca powerUps na tela
 var powerInt = setInterval(function (){
+
+    // Se for um jogo com powerUps e não tiver nenhum na tela
     if(especial && !powerIn){
-        powerUp()
+
+        // Cria um powerUp
+        powerUp();
+
     }
-}, 15000)
 
+}, 15000);
 
-
+// Função que roda ao carregar a pagina
 function play(){
-    document.getElementById('play').style.display = 'flex'
+
+    // Faz aparecer as opções de jogo (normal e especial)
+    document.getElementById('play').style.display = 'flex';
+
 }
 
 function playButton(modo){
@@ -46,7 +102,13 @@ function playButton(modo){
         }, 15000)
     }
     direcaoHori = movOriginalHori
+    if(Math.random() > 0.5){
+        direcaoHori *= -1;
+    }
     direcaoVerti = movOriginalVerti
+    if(Math.random() > 0.5){
+        direcaoVerti *= -1;
+    }
     batidas = 0
     document.getElementById('play').style.display = 'none'
     document.getElementById('telaFinal').style.display = 'none'
@@ -77,7 +139,7 @@ function moveP1(){
     if(mousePosition != posP[0][1]){
         movimento = mousePosition - posP[0][1]
         
-        if(posP[0][1] + movimento > altTela - tamP[1] / 2 || posP[0][1] + movimento < 0 + tamP[1] / 2){
+        if(posP[0][1] + movimento > altTela - tamP[0][1] / 2 || posP[0][1] + movimento < 0 + tamP[0][1] / 2){
             return
         }
 
@@ -85,21 +147,6 @@ function moveP1(){
         document.getElementById('p1').style.top = posP[0][1] + 'px'
 
     }
-
-    // let movimento;
-    // if(posAtual[1] != posP[0][1]){
-    //     movimento = posAtual[1] - posP[0][1]
-
-        
-    //     if(posP[0][1] + movimento > altTela - tamP[1] / 2 || posP[0][1] + movimento < 0 + tamP[1] / 2){
-    //         return
-    //     }
-
-
-    //     posP[0][1] += movimento
-    //     document.getElementById('p1').style.top = posP[1][1] + 'px'
-
-    // }
 
 }
 
@@ -139,18 +186,20 @@ function moverBola(){
         posAtual[1] += direcaoVerti
     }
 
-    if(posAtual[1] + direcaoVerti > posP[0][1] - tamP[1] / 2 && posAtual[1] + direcaoVerti < posP[0][1] + tamP[1] / 2){
-        if(posAtual[0] - tamBola / 2 + direcaoHori <= posP[0][0] + tamP[0] / 2){
+    if(posAtual[1] + direcaoVerti > posP[0][1] - tamP[0][1] / 2 && posAtual[1] + direcaoVerti < posP[0][1] + tamP[0][1] / 2){
+        if(posAtual[0] - tamBola / 2 + direcaoHori <= posP[0][0] + tamP[0][0] / 2){
             direcaoHori *= -1
-            posAtual[0] = posP[0][0] + tamP[0] / 2 + tamBola / 2
+            ultBatida = 'left'
+            posAtual[0] = posP[0][0] + tamP[0][0] / 2 + tamBola / 2
             batidas++
         }
     }
     
 
-    if(posAtual[1] + direcaoVerti > posP[1][1] - tamP[1] / 2 && posAtual[1] + direcaoVerti < posP[1][1] + tamP[1] / 2){
-        if(posAtual[0] + tamBola / 2 >= largTela - posP[1][0] - tamP[0] / 2){
+    if(posAtual[1] + direcaoVerti > posP[1][1] - tamP[1][1] / 2 && posAtual[1] + direcaoVerti < posP[1][1] + tamP[1][1] / 2){
+        if(posAtual[0] + tamBola / 2 >= largTela - posP[1][0] - tamP[1][0] / 2){
             direcaoHori *= -1
+            ultBatida = 'right'
             batidas++
         }
     }
@@ -215,7 +264,8 @@ function moverBola(){
 
 function power(){
     let tamOriginal
-    if(document.getElementById('powerUp').classList[0] == 'aumentar'){
+    let powerUpTipo = document.getElementById('powerUp').classList[0]
+    if(powerUpTipo == 'aumentar'){
         tamOriginal = tamBola
         tamBola = 100
         document.getElementById('bola').style.width = tamBola + 'px'
@@ -226,7 +276,7 @@ function power(){
             tamBola = tamOriginal
         }, 5000)
     }
-    if(document.getElementById('powerUp').classList[0] == 'diminuir'){
+    if(powerUpTipo == 'diminuir'){
         tamOriginal = tamBola
         tamBola = 40
         document.getElementById('bola').style.width = tamBola + 'px'
@@ -235,6 +285,68 @@ function power(){
             document.getElementById('bola').style.width = tamOriginal + 'px'
             document.getElementById('bola').style.height = tamOriginal + 'px'
             tamBola = tamOriginal
+        }, 5000)
+    }
+    if(powerUpTipo == 'invertX'){
+        direcaoHori *= -1;
+    }
+    if(powerUpTipo == 'invertY'){
+        direcaoVerti *= -1;
+    }
+    if(powerUpTipo == 'diminuirP'){
+        let value = 0
+        if(ultBatida == 'left'){
+            value = 0
+        }else{
+            value = 1
+        }
+        tamOriginal = tamP[value][1]
+        tamStick = tamOriginal - tamOriginal / 4
+        tamP[value][1] = tamStick
+        if(value == 0){
+            document.getElementById('p1').style.height = tamStick + 'px'
+            document.getElementById('p1').style.backgroundColor = 'cyan'
+        }else{
+            document.getElementById('p2').style.height = tamStick + 'px'
+            document.getElementById('p2').style.backgroundColor = 'cyan'
+        }
+        setTimeout(function (){
+            tamP[value][1] = tamOriginal
+            if(value == 0){
+                document.getElementById('p1').style.height = tamP[value][1] + 'px'
+                document.getElementById('p1').style.backgroundColor = 'white'
+            }else{
+                document.getElementById('p2').style.height = tamP[value][1] + 'px'
+                document.getElementById('p2').style.backgroundColor = 'white'
+            }
+        }, 5000)
+    }
+    if(powerUpTipo == 'aumentarP'){
+        let value = 0
+        if(ultBatida == 'left'){
+            value = 0
+        }else{
+            value = 1
+        }
+        tamOriginal = tamP[value][1]
+        tamStick = tamOriginal + tamOriginal / 2
+        tamP[value][1] = tamStick
+        if(value == 0){
+            document.getElementById('p1').style.height = tamStick + 'px'
+            document.getElementById('p1').style.backgroundColor = 'cyan'
+        }else{
+            document.getElementById('p2').style.height = tamStick + 'px'
+            document.getElementById('p2').style.backgroundColor = 'cyan'
+        }
+        setTimeout(function (){
+            tamP[value][1] = tamOriginal
+            if(value == 0){
+                document.getElementById('p1').style.height = tamP[value][1] + 'px'
+                document.getElementById('p1').style.backgroundColor = 'white'
+            }else{
+                document.getElementById('p2').style.height = tamP[value][1] + 'px'
+                document.getElementById('p2').style.backgroundColor = 'white'
+            }
         }, 5000)
     }
 }
@@ -250,7 +362,7 @@ function movP2(){
         movimento = posAtual[1] - posP[1][1]
 
         
-        if(posP[1][1] + movimento > altTela - tamP[1] / 2 || posP[1][1] + movimento < 0 + tamP[1] / 2){
+        if(posP[1][1] + movimento > altTela - tamP[1][1] / 2 || posP[1][1] + movimento < 0 + tamP[1][1] / 2){
             return
         }
 
@@ -270,7 +382,6 @@ function telaFinal(){
 
 function powerUp(){
     powerIn = true
-    let escolhaPower = ['aumentar', 'diminuir']
     let esc = Math.floor(Math.random() * escolhaPower.length)
     console.log(esc)
     esc = escolhaPower[esc]
