@@ -1,6 +1,4 @@
 
-// Posição atual da bola [X, Y]
-var posAtual = [0, 0];
 
 // Número de rebatidas ocorridas durante o jogo
 var batidas = 0;
@@ -45,10 +43,14 @@ var movP = 0.1;
 var statusJogo = 'stop';
 
 // Pega a bola atual
-var bolaAtual;
+var bolaAtual = [];
 
 // O tamanho da bola
 var tamBola;
+
+// Posição atual da bola [X, Y]
+var posAtual = [];
+var movBolas = []
 
 // Irá guardar o Interval de movimento da bola
 var mover;;
@@ -63,7 +65,8 @@ var powerIn = false;
 var posPower = [0, 0];
 
 // Os powerUps possiveis
-var escolhaPower = ['aumentar', 'diminuir', 'invertX', 'invertY', 'diminuirP', 'aumentarP'];
+var escolhaPower = ['aumentar', 'diminuir', 'invertX', 'invertY', 'diminuirP', 'aumentarP', 'duplicar', 'triplicar'];
+// , 
 
 // O stick que bateu na bola por último ('left' ou 'right')
 var ultBatida;
@@ -120,26 +123,9 @@ function playButton(modo){
     }
 
     // A direção horizontal se torna igual ao movimento original
-    direcaoHori = movOriginalHori;
 
-    // Roda um valor aleatório que define se vai começar indo pra esquerda ou direita
-    if(Math.random() > 0.5){
 
-        // A bola vai começar indo pra esquerda
-        direcaoHori *= -1;
-
-    }
-
-    // A direção vertical se torna igual ao movimento original
-    direcaoVerti = movOriginalVerti;
-
-    // Roda um valor aleatório que define se vai começar indo pra cima ou baixo
-    if(Math.random() > 0.5){
-
-        // A bola vai começar subindo
-        direcaoVerti *= -1;
-
-    }
+    
 
     // Reseta o número de batidas
     batidas = 0;
@@ -153,11 +139,10 @@ function playButton(modo){
     // Cria uma nova bola na tela
     criarBola();
 
-    // Pega a bola atual
-    bolaAtual = document.getElementById('bola');
+
 
     // Pega o tamanho da bola
-    tamBola = bolaAtual.clientHeight;
+    tamBola = bolaAtual[0].clientHeight;
 
     // Vai esperar um segundo para começar a mover a bola
     setTimeout(function (){
@@ -232,7 +217,9 @@ function criarBola(){
     let bola = document.createElement('div');
 
     // Define o id da bola como 'bola'
-    bola.id = 'bola';
+    let numId = bolaAtual.length + 1
+    bola.id = 'bola' + numId;
+    bola.classList.add('bola')
 
     // A bola vai começar no meio da tela
     let posX = parseInt(Number(largTela) / 2);
@@ -241,7 +228,24 @@ function criarBola(){
     let posY = parseInt(Number(altTela) / 2);
 
     // Define a posição da bola
-    posAtual = [posX, posY];
+    posAtual.push([posX, posY]);
+
+    movBolas.push([movOriginalHori, movOriginalVerti]);
+    // Roda um valor aleatório que define se vai começar indo pra esquerda ou direita
+    if(Math.random() > 0.5){
+
+        // A bola vai começar indo pra esquerda
+        movBolas[bolaAtual.length][0] *= -1;
+
+    }
+
+    // Roda um valor aleatório que define se vai começar indo pra cima ou baixo
+    if(Math.random() > 0.5){
+
+        // A bola vai começar subindo
+        movBolas[bolaAtual.length][1] *= -1;
+
+    }
 
     // Coloca a bola na altura certa
     bola.style.top =  posY+ 'px';
@@ -252,6 +256,9 @@ function criarBola(){
     // Coloca a bola na tela
     document.getElementById('mesa').appendChild(bola);
 
+    // bolaAtual.push([document.getElementById('bola' + numId)])
+    bolaAtual = document.getElementsByClassName('bola')
+
     // Define o jogo como 'run'
     statusJogo = 'run';
 
@@ -259,207 +266,228 @@ function criarBola(){
 
 // Função que move a bola
 function moverBola(){
+    for(let c = 0; c < bolaAtual.length; c++){
+        
 
-    // Se a posição X da bola mais a direção que ela esta indo mais o tamanho da bola dividido por 2 for maior ou igual a largura da tela
-    if(posAtual[0] + direcaoHori + tamBola / 2 >= largTela){
+        // Se a posição X da bola mais a direção que ela esta indo mais o tamanho da bola dividido por 2 for maior ou igual a largura da tela
+        if(posAtual[c][0] + movBolas[c][0] + tamBola / 2 >= largTela){
 
-        // Define o eixo X da bola como a largura da tela menos o tamanho da bola dividido por 2
-        posAtual[0] = largTela - tamBola / 2;
+            // Define o eixo X da bola como a largura da tela menos o tamanho da bola dividido por 2
+            posAtual[c][0] = largTela - tamBola / 2;
 
-    // Senão se o eixo X da bola menos o tamanho da bola dividido por 2 mais a direção que a bola esta indo for menor ou igual a 0
-    }else if(posAtual[0] - (tamBola / 2) + direcaoHori  <= 0){
+        // Senão se o eixo X da bola menos o tamanho da bola dividido por 2 mais a direção que a bola esta indo for menor ou igual a 0
+        }else if(posAtual[c][0] - (tamBola / 2) + movBolas[c][0]  <= 0){
 
-        // Define o eixo X como 0 mais o tamanho da bola dividido por 2
-        posAtual[0] = 0 + tamBola / 2;
+            // Define o eixo X como 0 mais o tamanho da bola dividido por 2
+            posAtual[c][0] = 0 + tamBola / 2;
 
-    // Senão
-    }else{
-
-        // Move a bola horizontalmente
-        posAtual[0] += direcaoHori;
-
-    }
-
-    // Se o eixo Y da bola mais o tamanho da bola dividido por 2 mais a direção que ela esta indo na vertical for maior ou igual a altura da tela
-    if(posAtual[1] + tamBola / 2 + direcaoVerti >= altTela){
-
-        // Define a altura atual da bola como a altura da tela menos o tamanho da bola dividido por 2
-        posAtual[1] = altTela - tamBola / 2;
-
-        // Inverte a direção que a bola está indo verticalmente
-        direcaoVerti *= -1;
-
-    // Senão se a altura atual da bola menos o tamanho da bola dividido por 2 mais a direção que ele está indo na vertical for maior ou igual a 0
-    }else if(posAtual[1] - tamBola / 2 + direcaoVerti <= 0){
-
-        // Define a altura da bola como 0 mais o tamanho da bola dividido por 2
-        posAtual[1] = 0 + tamBola / 2;
-
-        // Inverte a direção que a bola está indo verticalmente
-        direcaoVerti *= -1;
-
-    // Senão
-    }else{
-
-        // Move a bola verticalmente
-        posAtual[1] += direcaoVerti;
-
-    }
-
-    // Se a altura da bola mais a direção que ela está indo for maior que a altura do primeiro Stick menos o tamanho dele dividido por 2
-    // ( Se a altura da bola for maior que o ponto mais alto do primeiro Stick ) E
-    // a altura da bola mais a direção que ela está indo for menor que a altura do primeiro Stick mais o tamanho dele dividido por 2
-    // ( Se a altura da bola for menor que o ponto mais baixo do primeiro Stick )
-    if(posAtual[1] + direcaoVerti > posP[0][1] - tamP[0][1] / 2 && posAtual[1] + direcaoVerti < posP[0][1] + tamP[0][1] / 2){
-
-        // Se o eixo X da bola menos o tamanho da bola dividido por 2 for menor ou igual ao eixo X do primeiro Stick mais a largura do Stick dividido por 2
-        if(posAtual[0] - tamBola / 2 + direcaoHori <= posP[0][0] + tamP[0][0] / 2){
-
-            // Inverte a direção horizontal
-            direcaoHori *= -1;
-
-            // Diz que a última pessoa a bater na bola foi o primeiro Stick
-            ultBatida = 'left';
-
-            // Define o eixo X da bola como o eixo X do primeiro Stick mais a largura do primeiro Stick dividido por 2 mais o tamanho da bola dividido por 2
-            posAtual[0] = posP[0][0] + tamP[0][0] / 2 + tamBola / 2;
-
-            // Adiciona mais 1 ao contador de batidas
-            batidas++;
+        // Senão
+        }else{
+            // Move a bola horizontalmente
+            posAtual[c][0] += movBolas[c][0];
 
         }
 
-    }
-    
-    // Se o eixo X da bola mais a direção que ela está indo for maior que a altura do segundo Stick menos a altura dele dividido por 2
-    // ( Se a altura da bola for maior que o ponto mais alto do segundo Stick ) E
-    // e o eixo X da bola mais a direção que ela está indo for menor que a altura do segundo Stick mais a altura dele dividido por 2
-    if(posAtual[1] + direcaoVerti > posP[1][1] - tamP[1][1] / 2 && posAtual[1] + direcaoVerti < posP[1][1] + tamP[1][1] / 2){
 
-        // Se o eixo X da bola mais o tamanho dela dividido por 2 for maior ou igual a largura da tela menos o eixo X do segundo Stick menos a largura do segundo Stick dividido por 2
-        if(posAtual[0] + tamBola / 2 >= largTela - posP[1][0] - tamP[1][0] / 2){
+        // Se o eixo Y da bola mais o tamanho da bola dividido por 2 mais a direção que ela esta indo na vertical for maior ou igual a altura da tela
+        if(posAtual[c][1] + tamBola / 2 + movBolas[c][1] >= altTela){
 
-            // Inverte a direção horizontal da bola
-            direcaoHori *= -1;
+            // Define a altura atual da bola como a altura da tela menos o tamanho da bola dividido por 2
+            posAtual[c][1] = altTela - tamBola / 2;
 
-            // define que o último a bater na bola foi o segundo Stick
-            ultBatida = 'right';
+            // Inverte a direção que a bola está indo verticalmente
+            movBolas[c][1] *= -1;
 
-            // Adiciona mais um ao valor da contagem de batidas
-            batidas++;
+        // Senão se a altura atual da bola menos o tamanho da bola dividido por 2 mais a direção que ele está indo na vertical for maior ou igual a 0
+        }else if(posAtual[c][1] - tamBola / 2 + movBolas[c][1] <= 0){
+
+            // Define a altura da bola como 0 mais o tamanho da bola dividido por 2
+            posAtual[c][1] = 0 + tamBola / 2;
+
+            // Inverte a direção que a bola está indo verticalmente
+            movBolas[c][1]*= -1;
+
+        // Senão
+        }else{
+
+            // Move a bola verticalmente
+            posAtual[c][1] += movBolas[c][1];
 
         }
 
+
+        // Se a altura da bola mais a direção que ela está indo for maior que a altura do primeiro Stick menos o tamanho dele dividido por 2
+        // ( Se a altura da bola for maior que o ponto mais alto do primeiro Stick ) E
+        // a altura da bola mais a direção que ela está indo for menor que a altura do primeiro Stick mais o tamanho dele dividido por 2
+        // ( Se a altura da bola for menor que o ponto mais baixo do primeiro Stick )
+        if(posAtual[c][1] + movBolas[c][1] > posP[0][1] - tamP[0][1] / 2 && posAtual[c][1] + movBolas[c][1] < posP[0][1] + tamP[0][1] / 2){
+
+            // Se o eixo X da bola menos o tamanho da bola dividido por 2 for menor ou igual ao eixo X do primeiro Stick mais a largura do Stick dividido por 2
+            if(posAtual[c][0] - tamBola / 2 + movBolas[c][0] <= posP[0][0] + tamP[0][0] / 2){
+
+                // Inverte a direção horizontal
+                movBolas[c][0] *= -1;
+
+                // Diz que a última pessoa a bater na bola foi o primeiro Stick
+                ultBatida = 'left';
+
+                // Define o eixo X da bola como o eixo X do primeiro Stick mais a largura do primeiro Stick dividido por 2 mais o tamanho da bola dividido por 2
+                posAtual[c][0] = posP[0][0] + tamP[0][0] / 2 + tamBola / 2;
+
+                // Adiciona mais 1 ao contador de batidas
+                batidas++;
+
+            }
+
+        }
+
+
+
+        // Se o eixo X da bola mais a direção que ela está indo for maior que a altura do segundo Stick menos a altura dele dividido por 2
+        // ( Se a altura da bola for maior que o ponto mais alto do segundo Stick ) E
+        // e o eixo X da bola mais a direção que ela está indo for menor que a altura do segundo Stick mais a altura dele dividido por 2
+        if(posAtual[c][1] + movBolas[c][1] > posP[1][1] - tamP[1][1] / 2 && posAtual[c][1] + movBolas[c][1] < posP[1][1] + tamP[1][1] / 2){
+
+            // Se o eixo X da bola mais o tamanho dela dividido por 2 for maior ou igual a largura da tela menos o eixo X do segundo Stick menos a largura do segundo Stick dividido por 2
+            if(posAtual[c][0] + tamBola / 2 + movBolas[c][1] >= largTela - posP[1][0] - tamP[1][0] / 2){
+
+                // Inverte a direção horizontal da bola
+                movBolas[c][0] *= -1;
+                
+                // define que o último a bater na bola foi o segundo Stick
+                ultBatida = 'right';
+                
+                posAtual[c][0] = largTela - posP[0][0] - tamP[0][0] - tamBola / 2;
+
+                // Adiciona mais um ao valor da contagem de batidas
+                batidas++;
+
+            }
+
+        }
+
+
+        // Se a posição X da bola menos o tamanho da bola dividido por 2 for menor ou igual a 0 OU a posição X da bola mais o tamanho da bola dividido por 2 for maior ou igual a largura da tela 
+        if(posAtual[c][0] - tamBola / 2 <= 0 || posAtual[c][0] + tamBola / 2 >= largTela){
+            
+            document.getElementById(bolaAtual[c].id).remove()
+            movBolas.splice(c, 1)
+            posAtual.splice(c, 1)
+
+            // Remove a bola em jogo
+            if(bolaAtual.length == 0){
+                // Para de mover a bola
+                clearInterval(mover);
+
+                // Para de adicionar poderes
+                clearInterval(powerInt);
+
+                
+
+                // Define o status do jogo como parado
+                statusJogo = 'stop';
+
+                // Chama a tela final
+                telaFinal();
+
+            
+                return
+            }
+            continue
+        }
+
+
+
+        // Altera a posição horizontal da bola
+        bolaAtual[c].style.left = posAtual[c][0] + 'px';
+
+        // Altera a posição vertical da bola
+        bolaAtual[c].style.top = posAtual[c][1] + 'px';
+
     }
-
-    // Se a posição X da bola menos o tamanho da bola dividido por 2 for menor ou igual a 0 OU a posição X da bola mais o tamanho da bola dividido por 2 for maior ou igual a largura da tela 
-    if(posAtual[0] - tamBola / 2 <= 0 || posAtual[0] + tamBola / 2 >= largTela){
-
-        // Para de mover a bola
-        clearInterval(mover);
-
-        // Para de adicionar poderes
-        clearInterval(powerInt);
-
-        // Remove a bola em jogo
-        bolaAtual.remove();
-
-        // Define o status do jogo como parado
-        statusJogo = 'stop';
-
-        // Chama a tela final
-        telaFinal();
-
-        // Sai da função
-        return;
-
-    }
-
-    // Altera a posição horizontal da bola
-    bola.style.left = posAtual[0] + 'px';
-
-    // Altera a posição vertical da bola
-    bola.style.top = posAtual[1] + 'px';
-
 
     // Move o segundo Stick
-    movP2();
+    movP2()
+
 
     // Se o número de batidas for maior que 0
     if(batidas > 0){
 
-        // Se a bola estiver descendo
-        if(direcaoVerti > 0){
+        for(let c = 0; c < bolaAtual.length; c++){
+            // Se a bola estiver descendo
+            if(movBolas[c][1] > 0){
 
-            // Define a direção como direção original mais direção original vezes o número de batidas dividido por 5
-            direcaoVerti = movOriginalVerti + movOriginalVerti * (batidas / 5);
+                // Define a direção como direção original mais direção original vezes o número de batidas dividido por 5
+                movBolas[c][1] = movOriginalVerti + movOriginalVerti * (batidas / 5);
 
-            // Se a direção vertical for maior que 25
-            if(direcaoVerti > 25){
+                // Se a direção vertical for maior que 25
+                if(movBolas[c][1] > 25){
 
-                // Volta a direção a 25
-                direcaoVerti = 25;
+                    // Volta a direção a 25
+                    movBolas[c][1] = 25;
+
+                }
+
+            // Senão
+            }else{
+
+                // Define a direção como direção original mais direção original vezes o número de batidas dividido por 5, tudo isso vezes -1
+                movBolas[c][1] = (movOriginalVerti + movOriginalVerti * (batidas / 5))*-1;
+
+                // Se a direção vertical for menor que -25
+                if(movBolas[c][1] < -25){
+
+                    // Volta a direção a 25
+                    movBolas[c][1] = -25;
+            
+                }
 
             }
 
-        // Senão
-        }else{
+            // Se a bola estiver indo pra direita
+            if(movBolas[c][0] > 0){
 
-            // Define a direção como direção original mais direção original vezes o número de batidas dividido por 5, tudo isso vezes -1
-            direcaoVerti = (movOriginalVerti + movOriginalVerti * (batidas / 5))*-1;
+                // Define a direção como direção original mais direção original vezes 0 número de batidas vezes 5
+                movBolas[c][0] = movOriginalHori + movOriginalHori * (batidas / 5);
+                
+                // Se a direção horizontal for maior que 25
+                if(movBolas[c][0] > 25){
+                    
+                    // Volta a direção a 25
+                    movBolas[c][0] = 25;
+                    
+                }
+                
+            // Senão
+            }else{
 
-            // Se a direção vertical for menor que -25
-            if(direcaoVerti < -25){
+                // Define a direção como direção original mais direção original vezes 0 número de batidas vezes 5, tudo isso vezes -1
+                movBolas[c][0] = (movOriginalHori + movOriginalHori * (batidas / 5))*-1;
 
-                // Volta a direção a 25
-                direcaoVerti = -25;
-        
+                // Se a direção for menor que -25
+                if(movBolas[c][0] < -25){
+
+                    // Volta a direção a -25
+                    movBolas[c][0] = -25;
+
+                }
+
             }
 
         }
-
-        // Se a bola estiver indo pra direita
-        if(direcaoHori > 0){
-
-            // Define a direção como direção original mais direção original vezes 0 número de batidas vezes 5
-            direcaoHori = movOriginalHori + movOriginalHori * (batidas / 5);
-            
-            // Se a direção horizontal for maior que 25
-            if(direcaoHori > 25){
-                
-                // Volta a direção a 25
-                direcaoHori = 25;
-                
-            }
-            
-        // Senão
-        }else{
-
-            // Define a direção como direção original mais direção original vezes 0 número de batidas vezes 5, tudo isso vezes -1
-            direcaoHori = (movOriginalHori + movOriginalHori * (batidas / 5))*-1;
-
-            // Se a direção for menor que -25
-            if(direcaoHori < -25){
-
-                // Volta a direção a -25
-                direcaoHori = -25;
-
-            }
-
-        }
-
     }
+
 
     // Se tiver um poder na tela
     if(powerIn){
         
         // Se o eixo x da bola mais o tamanho da bola dividido por 2 menos 5 for maior que o eixo X da bola de poder menos o tamanho da bola dividido por 2 E
         // O eixo X da bola menos o tamanho da bola dividido por 2 mais 5 for menor que o eixo X da bola de poder mais o tamanho da bola dividido por 2
-        if(posAtual[0] + tamBola / 2 - 5 > posPower[0] - tamBola / 2 && posAtual[0] - tamBola / 2 + 5 < posPower[0] + tamBola / 2 ){
+        if(posAtual[0][0] + tamBola / 2 - 5 > posPower[0] - tamBola / 2 && posAtual[0][0] - tamBola / 2 + 5 < posPower[0] + tamBola / 2 ){
 
             // Se a altura da bola mais o tamanho da bola dividido por 2 for maior que o eixo Y da bola de poder menos o tamanho da bola dividido por 2 E
             // e a altura da bola mais o tamanho da bola dividido por 2 for menor que o eixo Y da bola de poder mais o tamanho da bola dividido por 2
-            if(posAtual[1] + tamBola / 2 > posPower[1] - tamBola / 2 && posAtual[1] + tamBola / 2 <  posPower[1] + tamBola / 2){
+            if(posAtual[0][1] + tamBola / 2 > posPower[1] - tamBola / 2 && posAtual[0][1] + tamBola / 2 <  posPower[1] + tamBola / 2){
 
                 // Chama a função power()
                 power();
@@ -472,7 +500,7 @@ function moverBola(){
             
             // Senão se a altura da bola menos o tamanho da bola dividido por 2 for menor que a altura da bola de poder mais o tamanho da bola dividido por 2 E
             // e a altura da bola menos o tamanho da bola dividido por 2 for maior que a altura da bola de poder menos o tamanho da bola
-            }else if(posAtual[1] - tamBola / 2 < posPower[1] + tamBola / 2 && posAtual[1] - tamBola / 2 >  posPower[1] - tamBola / 2){
+            }else if(posAtual[0][1] - tamBola / 2 < posPower[1] + tamBola / 2 && posAtual[0][1] - tamBola / 2 >  posPower[1] - tamBola / 2){
 
                 // Chama a função power()
                 power();
@@ -510,19 +538,19 @@ function power(){
         tamBola = tamOriginal + 20;
 
         // Muda a largura da bola
-        document.getElementById('bola').style.width = tamBola + 'px';
+        document.getElementsByClassName('bola')[0].style.width = tamBola + 'px';
 
         // Muda a altura da bola
-        document.getElementById('bola').style.height = tamBola + 'px';
+        document.getElementsByClassName('bola')[0].style.height = tamBola + 'px';
 
         // Vai fazer a bola voltar ao tamanho original em 5 segundos
         setTimeout(function (){
 
             // Faz a bola voltar a largura normal
-            document.getElementById('bola').style.width = tamOriginal + 'px';
+            document.getElementsByClassName('bola')[0].style.width = tamOriginal + 'px';
 
             // Faz a bola voltar a altura normal
-            document.getElementById('bola').style.height = tamOriginal + 'px';
+            document.getElementsByClassName('bola')[0].style.height = tamOriginal + 'px';
 
             // Redefine o tamanho da bola
             tamBola = tamOriginal;
@@ -541,19 +569,19 @@ function power(){
         tamBola = tamOriginal - 20;
 
         // Muda a largura da bola
-        document.getElementById('bola').style.width = tamBola + 'px';
+        document.getElementsByClassName('bola')[0].style.width = tamBola + 'px';
 
         // Muda a altura da bola
-        document.getElementById('bola').style.height = tamBola + 'px';
+        document.getElementsByClassName('bola')[0].style.height = tamBola + 'px';
 
         // Vai fazer a bola voltar ao tamanho normal depois de 5 segundos
         setTimeout(function (){
 
             // Faz a bola voltar a largura normal
-            document.getElementById('bola').style.width = tamOriginal + 'px';
+            document.getElementsByClassName('bola')[0].style.width = tamOriginal + 'px';
 
             // Faz a bola voltar a altura normal
-            document.getElementById('bola').style.height = tamOriginal + 'px';
+            document.getElementsByClassName('bola')[0].style.height = tamOriginal + 'px';
 
             // Redefine o tamanho da bola
             tamBola = tamOriginal;
@@ -566,7 +594,7 @@ function power(){
     if(powerUpTipo == 'invertX'){
 
         // Inverte a direção horizontal
-        direcaoHori *= -1;
+        movBolas[0][0] *= -1;
 
     }
 
@@ -574,7 +602,7 @@ function power(){
     if(powerUpTipo == 'invertY'){
 
         // Inverte a direção Y
-        direcaoVerti *= -1;
+        movBolas[0][1] *= -1;
 
     }
 
@@ -735,6 +763,43 @@ function power(){
 
     }
 
+    if(powerUpTipo == 'duplicar'){
+        criarBola()
+        posAtual[1] = [largTela/2, altTela/2]
+        movBolas[1] = [5, 5]
+        setTimeout(function (){
+
+            if(bolaAtual.length > 1){
+                bolaAtual[1].remove()
+                posAtual.splice(1, 1)
+                movBolas.splice(1, 1)
+            }
+
+        }, 5000);
+    }
+    if(powerUpTipo == 'triplicar'){
+        criarBola()
+        posAtual[1] = [largTela/2, altTela/2]
+        movBolas[1] = [5, 5]
+        criarBola()
+        posAtual[1] = [largTela/2, altTela/2]
+        movBolas[1] = [-5, -5]
+        setTimeout(function (){
+
+            if(bolaAtual.length > 1){
+                bolaAtual[1].remove()
+                posAtual.splice(1, 1)
+                movBolas.splice(1, 1)
+            }
+            if(bolaAtual.length > 1){
+                bolaAtual[1].remove()
+                posAtual.splice(1, 1)
+                movBolas.splice(1, 1)
+            }
+
+        }, 5000);
+    }
+
 }
 
 // Função que recarrega a página
@@ -745,17 +810,27 @@ function refresh(){
 
 }
 
-// Movimento o segundo Stick
+// // Movimento o segundo Stick
 function movP2(){
 
     // Irá guardar a diferença de distancia entre o segundo Stick e sua posição final
     let movimento;
+    let maior;
+    for(let c = 0; c < posAtual.length; c++){
+        if(c == 0){
+            maior = c
+        }else if(posAtual[c][0] > posAtual[maior][0]){
+            maior = c
+        }
+    }
+
+    let emBusca = posAtual[maior]
 
     // Se a altura da bola for diferente da altura do segundo Stick
-    if(posAtual[1] != posP[1][1]){
+    if(emBusca[1] != posP[1][1]){
 
         // Calcula a diferença da distancia entre a posição da bola e a altura do Stick
-        movimento = posAtual[1] - posP[1][1];
+        movimento = emBusca[1] - posP[1][1];
 
         // Se a altura do segundo Stick mais a diferença for maior que a tela menos a altura do Stick dividido por 2 OU
         // A altura do segundo Stick mais o movimento for menor que 0 mais a altura do segundo Stick dividido por 2
