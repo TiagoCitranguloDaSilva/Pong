@@ -208,6 +208,7 @@ function moveP1(){
 
     }
 
+
 }
 
 // Cria a bola
@@ -516,6 +517,8 @@ function moverBola(){
         }
 
     }
+
+    document.getElementById('cont').innerHTML = batidas;
 
 }
 
